@@ -1,0 +1,242 @@
+/* Copyright (c) 2017 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+ //Get out of here you Stupid LAWYERS!!!!!
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ /*
+
+ 
+ @version 1.0
+ 
+File: PleaseWORK.java
+
+Collaborators: Chris L., Brayden N., Luke C, Riley E, and Rocket I. 
+
+
+Requirements: Drive the robot with 4 mechanum wheels, a conveyor belt, and a shooter. 
+
+Constants: DcMotors
+
+Variables:
+     input:
+     
+     calculated:
+     
+Output:
+
+
+Key calculations:
+
+Key design considerations:
+
+
+
+*/
+
+
+
+package org.firstinspires.ftc.teamcode;
+//ZEc0nd C0nnnnent!
+
+import com.qualcomm.robotcore.*;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotor.*;
+import com.qualcomm.robotcore.util.Range; 
+
+
+
+@TeleOp(name="PleaseWORKNew", group="TeleOp")
+public class PleaseWORKNew extends LinearOpMode {
+
+    //Declare motors
+    private ElapsedTime runtime = new ElapsedTime();
+    
+    private DcMotor frontLeft = null;
+    private DcMotor frontRight = null;
+    private DcMotor backLeft = null;
+    private DcMotor backRight = null;
+    private DcMotor conveyor1 = null;
+    private DcMotor conveyor2 = null;
+    private DcMotor shooter = null;
+    private DcMotor shooter2 = null;
+    
+
+    @Override
+    public void runOpMode() {
+      telemetry.addData("Status", "Initialized");
+      telemetry.update();
+
+
+        //declare motors and assign them to the hardware
+        frontLeft  = hardwareMap.get(DcMotor.class, "front left");
+        frontRight  = hardwareMap.get(DcMotor.class, "front right");
+        backRight  = hardwareMap.get(DcMotor.class, "back right");
+        backLeft  = hardwareMap.get(DcMotor.class, "back left");
+        shooter  = hardwareMap.get(DcMotor.class, "shooter"); 
+        shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
+        conveyor1  = hardwareMap.get(DcMotor.class, "conveyor1");
+        conveyor2  = hardwareMap.get(DcMotor.class, "conveyor2");
+        
+        //declare Power variables for telemetry
+          double frontLeftPower = 0;
+          double frontRightPower = 0;
+          double backLeftPower = 0;
+          double backRightPower = 0;
+          double conveyor1Power = 0;
+          double shooterPower = 0;
+          double shooter2Power = 0;
+          double conveyor2Power = 0;
+          
+
+            
+
+         backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        shooter.setDirection(DcMotor.Direction.FORWARD);
+        shooter2.setDirection(DcMotor.Direction.REVERSE);
+
+         
+             
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        conveyor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        conveyor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
+        
+        // Wait for start 
+        waitForStart();
+        runtime.reset();
+
+ 
+        // run until the end of the match (at which time it will self-destruct)
+        
+        while (opModeIsActive()) {
+
+             telemetry.addData("Status", "Run Time: " + runtime.toString());
+             telemetry.addData("Motors", "frontLeft (%.2f)", frontLeftPower);
+             telemetry.addData("Motors", "frontRight (%.2f)", frontRightPower);
+             telemetry.addData("Motors", "backLeft (%.2f)", backLeftPower);
+             telemetry.addData("Motors", "backRight (%.2f)", backRightPower);
+            // telemetry.addData("Motors", "conveyor (%.2f)", conveyorPower);
+             telemetry.addData("Motors", "shooter (%.2f)", shooterPower);
+             telemetry.update();
+
+            //arbitrary variables for Chris's calculus
+            double y = 0;
+            double x= 0;
+            double z = 0;
+
+             y = gamepad1.left_stick_y ;
+             x = gamepad1.left_stick_x;
+             z = gamepad1.right_stick_x ;
+
+            frontLeftPower =  (y - x - z) ;
+            frontRightPower = (y + x + z);
+            backLeftPower = (y - x + z);
+            backRightPower = (y + x - z) ;
+            
+            
+            frontLeft.setPower(frontLeftPower);
+            frontRight.setPower(frontRightPower);
+            backLeft.setPower(backLeftPower);
+            backRight.setPower(backRightPower);
+            
+            shooterPower = gamepad2.left_stick_y;
+            shooter2Power = gamepad2.left_stick_y;
+
+            
+            shooter.setPower(shooterPower);
+            shooter2.setPower(shooter2Power);            
+            
+            //Ring Shooter - uses an if loop to move each component. 
+
+            
+           if (gamepad2.b)
+            {
+              conveyor1.setPower(-0.5);
+            }
+            
+            else   {
+             conveyor1.setPower(0);
+            }
+            if (gamepad2.a)
+            {
+              conveyor2.setPower(-0.5);
+            }
+            
+            else   {
+             conveyor2.setPower(0);
+            }
+            
+       
+          /* 
+            if (gamepad2.a)
+            {
+             
+             shooter.setPower(1);
+            }
+            else {
+                shooter.setPower(0);
+            }
+            */
+
+        }
+    }
+}

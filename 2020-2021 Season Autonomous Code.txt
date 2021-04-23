@@ -1,0 +1,423 @@
+
+//AUTONOMOUS PLAN: 
+
+/* 1. Move forward, wobble goal on side of bot  
+    2. Put rings in Low Goal
+    3. Back up, park on Launch Line
+*
+*/
+
+//MOVE WOBBLE goal beyond launch line during drive-controlled period for endgame 
+    //endgame, put wobble goal back on start line
+
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.*;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.Range;
+
+
+@Autonomous(name="AutoCodeNew", group="Autonomous")
+
+public class AutoCodeNEW extends OpMode
+{
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private DcMotor frontLeft = null;
+    private DcMotor frontRight = null;
+    private DcMotor backLeft = null;
+    private DcMotor backRight = null;
+    private DcMotor conveyor1 = null;
+    private DcMotor conveyor2 = null;
+    private DcMotor shooter = null;
+    private DcMotor shooter2 = null;
+ // private Servo servo = null;
+
+
+    
+    private int howMuch1 = 80; //inches
+    private int howMuch2 = 60;
+   // private double wheel_circumference = 3.14159 * 1.5 * 2;
+    final double clicksPerInch = 88; //from my other team's autonomous code
+      
+    //28
+
+    
+    
+    /*
+     * Code to run ONCE when the driver hits INIT
+     */
+    @Override
+    public void init() {
+        telemetry.addData("Status", "Initialized");
+        
+        frontRight  = hardwareMap.get(DcMotor.class, "front right");
+        frontLeft  = hardwareMap.get(DcMotor.class, "front left");
+        backRight  = hardwareMap.get(DcMotor.class, "back right");
+        backLeft  = hardwareMap.get(DcMotor.class, "back left");
+        shooter  = hardwareMap.get(DcMotor.class, "shooter"); 
+        shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
+        conveyor1  = hardwareMap.get(DcMotor.class, "conveyor1");
+        conveyor2  = hardwareMap.get(DcMotor.class, "conveyor2");
+   //     servo = hardwareMap.servo.get("servo");
+        
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        shooter.setDirection(DcMotor.Direction.REVERSE);
+        conveyor2.setDirection(DcMotor.Direction.REVERSE);
+        
+        
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        conveyor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        conveyor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);         
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        conveyor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        conveyor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
+     //   servo.setPosition(0.75);
+
+    }
+    
+    
+    /*
+    * Place where we call the functions 
+    */
+    public void runOpMode() {
+        init();
+        start();
+        loop();
+        //stop();
+        
+    }
+    
+    /*
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
+    @Override
+    public void init_loop() {
+        
+        
+    }
+
+
+
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     */
+    @Override
+    public void start() {
+        runtime.reset();
+    }
+
+
+
+    /*
+     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+     */
+     
+     //variables for Method loop():
+     
+    //declare Power variables for telemetry
+    
+    
+
+    
+    int phase = 0;
+     
+    @Override
+    
+    //Setting wheels to negative speed == robot moves forward
+    public void loop() {
+        
+        double frontLeftPower = 0;
+        double frontRightPower = 0;
+        double backLeftPower = 0;
+        double backRightPower = 0;
+        double conveyor1Power = 0;
+        double conveyor2Power = 0;        
+        double shooterPower = 0;
+
+        double lfPos = 0;  
+        double rfPos = 0; 
+        double lrPos = 0; 
+        double rrPos = 0;
+        double c1Pos = 0;
+        double c2Pos = 0;
+        double sPos = 0;
+  //      double servPos = 0;
+        
+        
+           // telemetry.addData("Status", "Running");
+          //  telemetry.addLine("Move Foward");
+            telemetry.addData("Status", "Phase " + phase + " Active"); 
+            
+            /* FOR TESTING
+            telemetry.addData(" FrontLeft: %7d", lfPos);
+            telemetry.addData(" FrontRight: %7d", rfPos);
+            telemetry.addData(" BackLeft: %7d", lrPos);
+            telemetry.addData(" BackRight: %7d", rrPos);
+            telemetry.addData("Actual", "%7d :%7d: %7d: %7d", frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), backLeft.getCurrentPosition(),backRight.getCurrentPosition());
+            */
+            telemetry.update();
+       
+       switch (phase) {
+          case 0: //Move Forward towards Tower Goal
+       //negative speed = moving forwards
+            frontLeftPower = -1;
+            frontRightPower = -1;
+            backLeftPower = -1;
+            backRightPower = -1;
+            conveyor1Power = 0;
+            conveyor2Power = 0;            
+            shooterPower = 0;
+            
+            
+            rfPos = howMuch1 * clicksPerInch; // conversion from clicks to in
+            rrPos = howMuch1 * clicksPerInch;
+            lrPos = howMuch1 * clicksPerInch;
+            lfPos = howMuch1 * clicksPerInch; 
+       //   servo.setPosition(0.75);
+            c1Pos = 0;
+            c2Pos = 0;
+            sPos = 0;
+
+        break;
+        
+       case 1:
+            frontLeftPower = 0;
+            frontRightPower = 0;
+            backLeftPower = 0;
+            backRightPower = 0;
+            conveyor1Power = 0;
+            conveyor2Power = 0;
+            shooterPower = 0;
+            
+            rfPos = 0; // conversion from clicks to in here
+            rrPos = 0;
+            lrPos = 0;
+            lfPos = 0; 
+            c1Pos = 0;
+            c2Pos = 0;
+            sPos = 0;
+         break;
+         
+         case 2: 
+             
+        /*     
+            frontLeftPower = 1;
+            frontRightPower = 1;
+            backLeftPower = 1;
+            backRightPower = 1;
+            conveyor1Power = 0;
+            conveyor2Power = 0;            
+            shooterPower = 1;
+
+             
+            c1Pos = 0;
+            c2Pos = 0;
+            sPos = 0;
+            rfPos = howMuch2 * clicksPerInch; 
+            rrPos =howMuch2 * clicksPerInch;
+            lrPos =howMuch2 * clicksPerInch;
+            lfPos = howMuch2 * clicksPerInch;
+             
+              break;
+              */
+              
+        case 3: 
+            
+            frontLeftPower = 0;
+            frontRightPower = 0;
+            backLeftPower = 0;
+            backRightPower = 0;
+            conveyor1Power = 0;
+            conveyor2Power = 0;         
+            shooterPower = 0;         
+
+            
+            
+            c1Pos = 0;
+            c2Pos = 0;
+            sPos = 0;
+            rfPos = 0; 
+            rrPos = 0;
+            lrPos = 0;
+            lfPos = 0; 
+            
+            break;
+        }
+        
+    
+        
+        boolean frDone = false;
+        boolean brDone = false;
+        boolean flDone = false;
+        boolean blDone = false;
+        boolean shooterDone = false;
+        boolean conveyor1Done = false;
+        boolean conveyor2Done = false;       
+        
+  
+        if (Math.abs(rfPos) <= Math.abs(frontRight.getCurrentPosition())) {
+            frontRightPower = 0;
+           // telemetry.addLine("HIIIIIIIIIIIIIIIIIIIIIIii=");
+            frDone = true;  
+        }
+
+        if (Math.abs(lfPos) <= Math.abs(frontLeft.getCurrentPosition())) {
+            frontLeftPower = 0;
+            flDone = true;  
+        }
+
+        if (Math.abs(rrPos) <= Math.abs(backRight.getCurrentPosition())) {
+            backRightPower = 0;
+            brDone = true;  
+        }       
+
+        if (Math.abs(lrPos) <= Math.abs(backLeft.getCurrentPosition())) {
+            backLeftPower = 0;
+            blDone = true;  
+        } 
+        
+        if (Math.abs(c1Pos) <= Math.abs(conveyor1.getCurrentPosition())) {
+            conveyor1Power = 0;
+            conveyor1Done = true;  
+        }
+        
+        
+        if (Math.abs(c2Pos) <= Math.abs(conveyor2.getCurrentPosition())) {
+            conveyor2Power = 0;
+            conveyor2Done = true;  
+        }
+        
+        if (Math.abs(sPos) <= Math.abs(shooter.getCurrentPosition())) {
+            shooterPower = 0;
+            shooterDone = true;  
+        }
+                
+        
+    //   telemetry.addLine(frDone + " " + brDone + " " + flDone + " " + blDone);
+        
+        if (frDone && brDone && flDone && blDone && conveyor1Done && conveyor2Done && shooterDone) {
+            phase++;
+           // telemetry.addLine("Phase" + phase + "Complete");
+
+
+          //  sleep(100);
+        }
+            
+            
+          
+
+ //           double frontLeftPower = 0;
+   //     double backLeftPower = 0;
+     //   double backRightPower = 0;
+       // double conveyorPower = 0;
+    //    double shooterPower = 0;
+        
+        
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
+        shooter.setPower(shooterPower);
+        shooter2.setPower(shooterPower);
+        conveyor1.setPower(conveyor1Power);
+        conveyor2.setPower(conveyor2Power);
+        
+           // telemetry.addData("Status", "Switch Exited");
+
+        
+          //AFTER if and switch - ALL NORMAL TELEOP CODE inside PleaseWORK while loop
+        
+        
+    }
+        
+        
+        
+        
+        
+        
+        
+      //  leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+       // rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+
+        // Tank Mode uses one stick to control each wheel.
+        // - This requires no math, but it is hard to drive forward slowly and keep straight.
+        // leftPower  = -gamepad1.left_stick_y ;
+        // rightPower = -gamepad1.right_stick_y ;
+
+        
+
+        // Show the elapsed game time and wheel power.
+        /*
+             telemetry.addData("Status", "Run Time: " + runtime.toString());
+             telemetry.addData("Motors", "frontLeft (%.2f)", frontLeftPower);
+             telemetry.addData("Motors", "frontRight (%.2f)", frontRightPower);
+             telemetry.addData("Motors", "backLeft (%.2f)", backLeftPower);
+             telemetry.addData("Motors", "backRight (%.2f)", backRightPower);
+             telemetry.addData("Motors", "conveyor (%.2f)", conveyorPower);
+             telemetry.addData("Motors", "shooter (%.2f)", shooterPower);
+             */
+             
+             
+             
+                     
+   /*     if ((rfPos +25 ) > frontRight.getCurrentPosition() && (rfPos - 25) < frontRight.getCurrentPosition()) {
+            frontRightPower = 0;
+            frDone = true;
+        }
+           
+        if ((rrPos +25 ) > backRight.getCurrentPosition() && (rrPos - 25) < backRight.getCurrentPosition()) {
+            brDone = true;
+            backRightPower = 0;
+                
+        }
+                
+        if ((lfPos +25 ) > frontLeft.getCurrentPosition() && (lfPos - 25) < frontLeft.getCurrentPosition()) {
+            flDone = true;
+            frontLeftPower = 0;
+            
+        }
+        
+        if ((lrPos +25 ) > backLeft.getCurrentPosition() && (lrPos - 25) < backLeft.getCurrentPosition()) {
+            blDone = true;
+            backLeftPower = 0;
+    
+        }
+        
+        
+        if (frDone == true && brDone == true && flDone == true && blDone == true) {
+            telemetry.addData("Status", "Phase" + phase + "Complete");
+            phase++;
+            
+            // sleep for 100 ms luke
+
+        }
+        
+     */         
+    }
+
+
+
